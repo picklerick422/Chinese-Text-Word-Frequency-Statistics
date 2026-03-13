@@ -1447,8 +1447,8 @@
                 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
                 <script>
                 (function() {
-                    var chartData = {{ chart_data | tojson }};
-                    var chartType = {{ chart_type | tojson }};
+                    var chartData = {{ chart_data|default([])|tojson }};
+                    var chartType = {{ chart_type|default('pie')|tojson }};
                     var labels = chartData.map(function(x) { return x[0]; });
                     var values = chartData.map(function(x) { return x[1]; });
                     var total = values.reduce(function(a,b){ return a+b; }, 0);
@@ -1844,7 +1844,7 @@
 
         function copyTableAsMarkdown() {
             let markdown = '';
-            const mode = '{{ mode }}'; // 从模板传递
+            const mode = '{{ mode|default('') }}'; // 从模板传递
 
             if (mode === 'search') {
                 // 从卡片中提取数据
@@ -1908,7 +1908,7 @@
 
         function copyTableAsText() {
             let text = '';
-            const mode = '{{ mode }}'; // 从模板传递
+            const mode = '{{ mode|default('') }}'; // 从模板传递
 
             if (mode === 'search') {
                 // 从卡片中提取数据
@@ -1982,7 +1982,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             // 全局数据存储（确保删除后数据统一）
             const globalData = {
-                totalOccurrences: {{ total_matched_occurrences }},
+                totalOccurrences: {{ total_matched_occurrences|default(0) }},
                 originalChartData: {{ chart_data | tojson if generate_chart and chart_data else '[]' }},
                 currentChartData: JSON.parse(JSON.stringify({{ chart_data | tojson if generate_chart and chart_data else '[]' }})),
                 deletedWords: [] // 记录已删除的词
@@ -2138,7 +2138,7 @@
                 const newChartData = [];
                 
                 // 分模式处理：search模式 / exact/seg模式
-                const mode = '{{ mode }}';
+                const mode = '{{ mode|default('') }}';
                 if (mode === 'search') {
                     // search模式：按关键词分组统计
                     const cards = document.querySelectorAll('.stats-results .card');
