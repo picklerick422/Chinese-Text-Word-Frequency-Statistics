@@ -533,30 +533,22 @@
         }
         .settings-panel-body {
             padding: 0.9rem 1.25rem 1.1rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.2rem;
         }
         .settings-panel-footer {
             padding: 0.75rem 1.25rem 0.9rem;
             border-top: 1px solid #e2e8f0;
             text-align: right;
         }
-        .settings-section {
-            display: flex;
-            flex-direction: column;
-            gap: 0.35rem;
-        }
         .settings-section-title {
             font-size: 0.9rem;
             font-weight: 600;
             color: #0f172a;
-            margin: 0;
+            margin-bottom: 0.5rem;
         }
         .settings-section-desc {
             font-size: 0.78rem;
             color: #6b7280;
-            margin: 0;
+            margin-bottom: 0.75rem;
         }
 
         /* 显示列数选择器 */
@@ -578,31 +570,6 @@
         .stats-results .card {
             display: flex;
             flex-direction: column;
-        }
-        /* 四列时标题和图标保留在同一行，并将匹配词数徽章靠右 */
-        .stats-results .card-header.four-cols {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 0.5rem;
-        }
-        .stats-results .card-header.four-cols .keyword-badge {
-            margin-top: 0;
-        }
-        /* 统计头部对齐 */
-        .stats-header h2 {
-            margin: 0;
-        }
-        .stats-header .badge-time,
-        .stats-header .copy-buttons {
-            line-height: 1.2;
-            display: flex;
-            align-items: center;
-        }
-        .stats-header .copy-buttons .btn {
-            padding: 0.5rem 0.75rem;
-            height: auto;
-            font-size: 1.0rem;
         }
         .settings-panel .form-check {
             padding-left: 0;
@@ -755,42 +722,6 @@
         }
         body[data-theme="dark"] h1 {
             color: #f1f5f9;
-        }
-
-        /* 紧凑模式样式 - 修复同行对齐问题 */
-        .compact-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            width: 100%;
-            align-items: flex-start; /* 确保列顶部对齐 */
-            margin: 0;
-            padding: 0;
-        }
-        .compact-row .compact-col {
-            flex: 1 1 100%;
-            min-width: 0;
-            margin-bottom: 1rem;
-            box-sizing: border-box;
-            padding: 0;
-        }
-        /* 紧凑模式激活时 - 强制两列同行 */
-        .compact-mode .compact-row .compact-col {
-            flex: 1 1 calc(50% - 0.5rem) !important; /* 强制等分 */
-            max-width: calc(50% - 0.5rem) !important;
-            min-width: calc(50% - 0.5rem) !important; /* 防止缩小导致换行 */
-            margin-bottom: 0;
-        }
-        .compact-mode .text-mode-only {
-            display: flex !important;
-        }
-        .compact-mode.file-mode .text-mode-only {
-            display: none !important;
-        }
-        /* 新增：缩小紧凑模式开关标签字体 */
-        .settings-section .form-check-label[for="compactMode"] {
-            font-size: 0.85rem;
-            font-weight: 400; /* 可选：降低字体粗细 */
         }
         body[data-theme="dark"] .form-label {
             color: #cbd5e1;
@@ -1067,81 +998,63 @@
                     </h5>
                 </div>
                 <div class="settings-panel-body">
-                    <div class="settings-section">
-                        <div class="settings-section-title">主题模式</div>
-                        <div class="settings-section-desc">选择浅色 / 深色，或跟随系统自动切换。</div>
-                        <div class="theme-picker" role="radiogroup" aria-label="主题模式">
-                            <label class="theme-option" for="themeAuto">
-                                <input type="radio" name="themeRadio" id="themeAuto" value="auto">
-                                <div class="theme-card">
-                                    <div class="theme-thumb auto">
-                                        <div class="theme-window"></div>
-                                        <div class="theme-dots">
-                                            <span class="theme-dot" style="background:#f87171;"></span>
-                                            <span class="theme-dot" style="background:#fbbf24;"></span>
-                                            <span class="theme-dot" style="background:#34d399;"></span>
-                                        </div>
+                    <div class="settings-section-title">主题模式</div>
+                    <div class="settings-section-desc">选择浅色 / 深色，或跟随系统自动切换。</div>
+                    <div class="theme-picker" role="radiogroup" aria-label="主题模式">
+                        <label class="theme-option" for="themeAuto">
+                            <input type="radio" name="themeRadio" id="themeAuto" value="auto">
+                            <div class="theme-card">
+                                <div class="theme-thumb auto">
+                                    <div class="theme-window"></div>
+                                    <div class="theme-dots">
+                                        <span class="theme-dot" style="background:#f87171;"></span>
+                                        <span class="theme-dot" style="background:#fbbf24;"></span>
+                                        <span class="theme-dot" style="background:#34d399;"></span>
                                     </div>
-                                    <div class="theme-label">Auto</div>
                                 </div>
-                            </label>
-
-                            <label class="theme-option" for="themeLight">
-                                <input type="radio" name="themeRadio" id="themeLight" value="light">
-                                <div class="theme-card">
-                                    <div class="theme-thumb light">
-                                        <div class="theme-window"></div>
-                                        <div class="theme-dots">
-                                            <span class="theme-dot" style="background:#f87171;"></span>
-                                            <span class="theme-dot" style="background:#fbbf24;"></span>
-                                            <span class="theme-dot" style="background:#34d399;"></span>
-                                        </div>
-                                    </div>
-                                    <div class="theme-label">Light</div>
-                                </div>
-                            </label>
-
-                            <label class="theme-option" for="themeDark">
-                                <input type="radio" name="themeRadio" id="themeDark" value="dark">
-                                <div class="theme-card">
-                                    <div class="theme-thumb dark">
-                                        <div class="theme-window"></div>
-                                        <div class="theme-dots">
-                                            <span class="theme-dot" style="background:#f87171;"></span>
-                                            <span class="theme-dot" style="background:#fbbf24;"></span>
-                                            <span class="theme-dot" style="background:#34d399;"></span>
-                                        </div>
-                                    </div>
-                                    <div class="theme-label">Dark</div>
-                                </div>
-                            </label>
-                        </div>
-                    </div>
-
-                    
-                    <div class="settings-section">
-                        <div class="settings-section-title">显示列数</div>
-                        <div class="settings-section-desc">选择统计结果的显示列数（仅对搜索模式有效）。</div>
-                        <select class="form-select" id="columnSelect" name="columnRadio" aria-label="显示列数">
-                            <option value="1">1 列</option>
-                            <option value="2">2 列</option>
-                            <option value="3">3 列</option>
-                            <option value="4">4 列</option>
-                        </select>
-                    </div>
-
-                    <div class="settings-section">
-                        <div class="settings-section-title">紧凑模式</div>
-                        <div class="settings-section-desc">开启后，统计选项设置界面将采用紧凑的两列布局。</div>
-                        <div class="d-flex align-items-center justify-content-between">
-                            <div class="me-2" style="min-width: 0;">
-                                <label class="form-check-label mb-0" for="compactMode" >启用紧凑模式</label>
+                                <div class="theme-label">Auto</div>
                             </div>
-                            <div class="form-check form-switch mb-0">
-                                <input class="form-check-input" type="checkbox" id="compactMode" name="compactMode" role="switch">
+                        </label>
+
+                        <label class="theme-option" for="themeLight">
+                            <input type="radio" name="themeRadio" id="themeLight" value="light">
+                            <div class="theme-card">
+                                <div class="theme-thumb light">
+                                    <div class="theme-window"></div>
+                                    <div class="theme-dots">
+                                        <span class="theme-dot" style="background:#f87171;"></span>
+                                        <span class="theme-dot" style="background:#fbbf24;"></span>
+                                        <span class="theme-dot" style="background:#34d399;"></span>
+                                    </div>
+                                </div>
+                                <div class="theme-label">Light</div>
                             </div>
-                        </div>
+                        </label>
+
+                        <label class="theme-option" for="themeDark">
+                            <input type="radio" name="themeRadio" id="themeDark" value="dark">
+                            <div class="theme-card">
+                                <div class="theme-thumb dark">
+                                    <div class="theme-window"></div>
+                                    <div class="theme-dots">
+                                        <span class="theme-dot" style="background:#f87171;"></span>
+                                        <span class="theme-dot" style="background:#fbbf24;"></span>
+                                        <span class="theme-dot" style="background:#34d399;"></span>
+                                    </div>
+                                </div>
+                                <div class="theme-label">Dark</div>
+                            </div>
+                        </label>
                     </div>
+
+                    <div class="settings-section-title">显示列数</div>
+                    <div class="settings-section-desc">选择统计结果的显示列数（仅对搜索模式有效）。</div>
+                    <select class="form-select" id="columnSelect" name="columnRadio" aria-label="显示列数">
+                        <option value="1">1 列</option>
+                        <option value="2">2 列</option>
+                        <option value="3">3 列</option>
+                        <option value="4">4 列</option>
+                    </select>
                 </div>
                 <div class="settings-panel-footer">
                     <button type="button" class="btn btn-secondary btn-sm" id="footerCloseSettingsBtn">
@@ -1164,7 +1077,7 @@
             <form method="post" enctype="multipart/form-data" id="statsForm">
                 <input type="hidden" name="display_columns" id="displayColumnsInput" value="3">
                 <!-- 输入方式选择 -->
-                <div class="input-method mb-4">
+                <div class="input-method">
                     <label class="method-option">
                         <input type="radio" name="input_type" value="file" {% if input_type != 'text' %}checked{% endif %} onchange="toggleInputMethod()">
                         <i class="bi bi-upload"></i> 上传文件
@@ -1175,79 +1088,60 @@
                     </label>
                 </div>
 
-                <!-- 紧凑模式布局容器 -->
-                <div class="form-layout-container">
-                    <!-- 文件上传区域 - 简化容器结构 -->
-                    <div id="file-area" class="input-area mb-4" {% if input_type == 'text' %}style="display: none;"{% endif %}>
-                        <div class="compact-row">
-                            <div class="compact-col">
-                                <label for="file" class="form-label">
-                                    <i class="bi bi-upload me-1"></i> 选择文本文件（UTF-8 编码）或 Word 文档（.docx）
-                                </label>
-                                <input type="file" class="form-control" id="file" name="file" accept=".txt,.docx">
-                            </div>
-                            <div class="compact-col">
-                                <label for="mode" class="form-label">
-                                    <i class="bi bi-sliders2 me-1"></i> 统计模式
-                                </label>
-                                <select class="form-select" id="mode" name="mode">
-                                    <option value="seg" {% if mode == 'seg' %}selected{% endif %}>分词匹配 (seg)</option>
-                                    <option value="exact" {% if mode == 'exact' %}selected{% endif %}>精确匹配 (exact)</option>
-                                    <option value="search" {% if mode == 'search' %}selected{% endif %}>搜索包含关键词的词 (search)</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
+                <!-- 文件上传区域 -->
+                <div id="file-area" class="input-area mb-4" {% if input_type == 'text' %}style="display: none;"{% endif %}>
+                    <label for="file" class="form-label">
+                        <i class="bi bi-upload me-1"></i> 选择文本文件（UTF-8 编码）或 Word 文档（.docx）
+                    </label>
+                    <input type="file" class="form-control" id="file" name="file" accept=".txt,.docx">
+                </div>
 
-                    <!-- 直接文本输入区域 -->
-                    <div id="text-area" class="input-area mb-4" {% if input_type != 'text' %}style="display: none;"{% endif %}>
-                        <label for="direct_text" class="form-label">
-                            <i class="bi bi-pencil me-1"></i> 输入文本内容
-                        </label>
-                        <textarea class="form-control" id="direct_text" name="direct_text" rows="8" placeholder="在此粘贴或输入要统计的中文文本...">{% if direct_text %}{{ direct_text }}{% endif %}</textarea>
-                    </div>
+                <!-- 直接文本输入区域 -->
+                <div id="text-area" class="input-area mb-4" {% if input_type != 'text' %}style="display: none;"{% endif %}>
+                    <label for="direct_text" class="form-label">
+                        <i class="bi bi-pencil me-1"></i> 输入文本内容
+                    </label>
+                    <textarea class="form-control" id="direct_text" name="direct_text" rows="8" placeholder="在此粘贴或输入要统计的中文文本...">{% if direct_text %}{{ direct_text }}{% endif %}</textarea>
+                </div>
 
-                    <!-- 关键词和类别统计 -->
-                    <div class="compact-row mb-4">
-                        <div class="compact-col">
-                            <label for="keywords" class="form-label">
-                                <i class="bi bi-key me-1"></i> 关键词（每行一个）
-                            </label>
-                            <textarea class="form-control" id="keywords" name="keywords" rows="5" placeholder="例如：&#10;曹操&#10;刘备&#10;诸葛亮" required>{% if keywords %}{{ keywords|join('\n') }}{% endif %}</textarea>
-                        </div>
-                        <div class="compact-col">
-                            <label for="categories" class="form-label">
-                                <i class="bi bi-tags me-1"></i> 类别统计（可选）<br>
-                                <small class="text-muted">每行格式：类别名: 词1, 词2, 词3</small>
-                            </label>
-                            <textarea class="form-control" id="categories" name="categories" rows="4" placeholder="例如：&#10;曹魏:曹操,曹丕,曹仁&#10;蜀汉:刘备,关羽,张飞">{% if categories_raw %}{{ categories_raw }}{% endif %}</textarea>
-                        </div>
-                    </div>
+                <div class="mb-4">
+                    <label for="keywords" class="form-label">
+                        <i class="bi bi-key me-1"></i> 关键词（每行一个）
+                    </label>
+                    <textarea class="form-control" id="keywords" name="keywords" rows="5" placeholder="例如：&#10;曹操&#10;刘备&#10;诸葛亮" required>{% if keywords %}{{ keywords|join('\n') }}{% endif %}</textarea>
+                </div>
 
-                    <!-- 统计模式和词频占比图 -->
-                    <div class="compact-row mb-4">
-                        <div class="compact-col">
-                            <label for="mode_text" class="form-label">
-                                <i class="bi bi-sliders2 me-1"></i> 统计模式
-                            </label>
-                            <select class="form-select" id="mode_text" name="mode">
-                                <option value="seg" {% if mode == 'seg' %}selected{% endif %}>分词匹配 (seg)</option>
-                                <option value="exact" {% if mode == 'exact' %}selected{% endif %}>精确匹配 (exact)</option>
-                                <option value="search" {% if mode == 'search' %}selected{% endif %}>搜索包含关键词的词 (search)</option>
-                            </select>
-                        </div>
-                        <div class="compact-col">
-                            <label for="chart_option" class="form-label">
-                                <i class="bi bi-pie-chart me-1"></i> 词频占比图
-                            </label>
-                            <select class="form-select" id="chart_option" name="chart_option">
-                                <option value="" {% if chart_option == '' %}selected{% endif %}>不生成</option>
-                                <option value="pie" {% if chart_option == 'pie' %}selected{% endif %}>饼状图</option>
-                                <option value="bar" {% if chart_option == 'bar' %}selected{% endif %}>柱状图</option>
-                                <option value="line" {% if chart_option == 'line' %}selected{% endif %}>折线图</option>
-                            </select>
-                        </div>
-                    </div>
+                <div class="mb-4">
+                    <label for="mode" class="form-label">
+                        <i class="bi bi-sliders2 me-1"></i> 统计模式
+                    </label>
+                    <select class="form-select" id="mode" name="mode">
+                        <option value="seg" {% if mode == 'seg' %}selected{% endif %}>分词匹配 (seg) - 将文本分词后匹配连续子序列</option>
+                        <option value="exact" {% if mode == 'exact' %}selected{% endif %}>精确匹配 (exact) - 直接字符串计数</option>
+                        <option value="search" {% if mode == 'search' %}selected{% endif %}>搜索包含关键词的词 (search) - 找出所有包含关键词的词及其频次</option>
+                    </select>
+                </div>
+
+                <!-- 类别定义区域（可选） -->
+                <div class="mb-4">
+                    <label for="categories" class="form-label">
+                        <i class="bi bi-tags me-1"></i> 类别统计（可选）<br>
+                        <small class="text-muted">每行格式：类别名: 词1, 词2, 词3</small>
+                    </label>
+                    <textarea class="form-control" id="categories" name="categories" rows="4" placeholder="例如：&#10;曹魏:曹操,曹丕,曹仁&#10;蜀汉:刘备,关羽,张飞">{% if categories_raw %}{{ categories_raw }}{% endif %}</textarea>
+                </div>
+
+                <!-- 词频占比图选项（与统计模式同款选择框） -->
+                <div class="mb-4">
+                    <label for="chart_option" class="form-label">
+                        <i class="bi bi-pie-chart me-1"></i> 词频占比图
+                    </label>
+                    <select class="form-select" id="chart_option" name="chart_option">
+                        <option value="" {% if chart_option == '' %}selected{% endif %}>不生成</option>
+                        <option value="pie" {% if chart_option == 'pie' %}selected{% endif %}>饼状图</option>
+                        <option value="bar" {% if chart_option == 'bar' %}selected{% endif %}>柱状图</option>
+                        <option value="line" {% if chart_option == 'line' %}selected{% endif %}>折线图</option>
+                    </select>
                 </div>
 
                 <div class="d-grid">
@@ -1260,21 +1154,21 @@
 
             {% if results is not none %}
                 <hr>
-                <div class="stats-header d-flex align-items-center justify-content-between">
+                <div class="stats-header">
+                    <h2><i class="bi bi-bar-chart-line me-2"></i>统计结果</h2>
                     <div class="d-flex align-items-center gap-2">
-                        <h2 class="d-flex align-items-center mb-0"><i class="bi bi-bar-chart-line me-2"></i>统计结果</h2>
-                        <span class="badge-time d-flex align-items-center">
+                        <span class="badge-time">
                             <i class="bi bi-clock-history me-1"></i> {{ "%.4f"|format(elapsed) }} 秒
                         </span>
-                    </div>
-                    <div class="copy-buttons d-flex align-items-center gap-1">
-                        <button class="btn btn-outline-secondary btn-sm" onclick="copyTableAsMarkdown()">
-                            <i class="bi bi-markdown"></i> 复制为 Markdown
-                        </button>
-                        <button class="btn btn-outline-secondary btn-sm" onclick="copyTableAsText()">
-                            <i class="bi bi-file-text"></i> 复制为纯文本
-                        </button>
-                        <span id="copyMessage" class="copy-success" style="display: none;">复制成功！</span>
+                        <div class="copy-buttons">
+                            <button class="btn btn-outline-secondary btn-sm" onclick="copyTableAsMarkdown()">
+                                <i class="bi bi-markdown"></i> 复制为 Markdown
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm" onclick="copyTableAsText()">
+                                <i class="bi bi-file-text"></i> 复制为纯文本
+                            </button>
+                            <span id="copyMessage" class="copy-success" style="display: none;">复制成功！</span>
+                        </div>
                     </div>
                 </div>
 
@@ -1286,7 +1180,7 @@
                             {% for kw, matches in column %}
                                 {% set group_total = matches.values()|sum %}
                                 <div class="card">
-                                    <div class="card-header{% if display_columns == 4 %} four-cols{% endif %}">
+                                    <div class="card-header">
                                         <i class="bi bi-tag me-2"></i>关键词 “{{ kw }}”
                                         <span class="keyword-badge">{{ matches|length }} 个匹配词</span>
                                     </div>
@@ -1556,8 +1450,6 @@
                     div.className = div.className.replace(/col-md-\d+/g, '').trim();
                     div.classList.add(colClass);
                 });
-                // 列数变化时更新标题样式
-                updateFourColsClass(columns);
                 // 再重新分配卡片以平衡高度
                 redistributeCards(columns);
             }
@@ -1568,20 +1460,11 @@
                     columnSelect.value = columns;
                 }
                 updateColumnsLayout(columns);
-                updateFourColsClass(columns);
             }
 
             // 初始应用一次
             const initialColumns = getSavedColumns();
             applyColumns(initialColumns);
-
-            function updateFourColsClass(columns) {
-                const headers = document.querySelectorAll('.stats-results .card-header');
-                headers.forEach(h => {
-                    if (columns === 4) h.classList.add('four-cols');
-                    else h.classList.remove('four-cols');
-                });
-            }
 
             // 监听下拉变化
             if (columnSelect) {
@@ -1592,12 +1475,6 @@
                     } catch (e) {}
                     applyColumns(columns);
                 });
-            }
-
-            // 紧凑模式管理
-            const compactCheckbox = document.getElementById('compactMode');
-            if (compactCheckbox) {
-                compactCheckbox.addEventListener('change', toggleCompactMode);
             }
 
             // 绑定自定义设置面板的打开/关闭逻辑（无遮罩）
@@ -1672,69 +1549,23 @@
             const textRadio = document.querySelector('input[name="input_type"][value="text"]');
             const fileArea = document.getElementById('file-area');
             const textArea = document.getElementById('text-area');
-            const formLayout = document.querySelector('.form-layout-container');
             const fileInput = document.getElementById('file');
             const textInput = document.getElementById('direct_text');
-            const modeFile = document.getElementById('mode');
-            const modeText = document.getElementById('mode_text');
 
             if (fileRadio.checked) {
                 fileArea.style.display = 'block';
                 textArea.style.display = 'none';
-                if (formLayout) {
-                    formLayout.classList.add('file-mode');
-                    formLayout.classList.remove('text-mode');
-                }
                 fileInput.disabled = false;
                 textInput.disabled = true;
-                if (modeFile && modeText) {
-                    modeFile.value = modeText.value;
-                }
             } else {
                 fileArea.style.display = 'none';
                 textArea.style.display = 'block';
-                if (formLayout) {
-                    formLayout.classList.add('text-mode');
-                    formLayout.classList.remove('file-mode');
-                }
                 fileInput.disabled = true;
                 textInput.disabled = false;
-                if (modeFile && modeText) {
-                    modeText.value = modeFile.value;
-                }
             }
-
-            // 强制重绘，确保 flex 布局生效
-            setTimeout(() => {
-                if (formLayout) {
-                    const computedStyle = window.getComputedStyle(formLayout);
-                    formLayout.style.display = computedStyle.display;
-                }
-            }, 0);
-        }
-
-        function toggleCompactMode() {
-            const isCompact = document.getElementById('compactMode').checked;
-            const formLayout = document.querySelector('.form-layout-container');
-
-            if (isCompact) {
-                if (formLayout) formLayout.classList.add('compact-mode');
-            } else {
-                if (formLayout) formLayout.classList.remove('compact-mode');
-            }
-
-            // 保存设置到localStorage
-            localStorage.setItem('compactMode', isCompact);
         }
 
         window.onload = function() {
-            // 加载紧凑模式设置
-            const savedCompact = localStorage.getItem('compactMode') === 'true';
-            const compactCheckbox = document.getElementById('compactMode');
-            if (compactCheckbox) {
-                compactCheckbox.checked = savedCompact;
-                toggleCompactMode();
-            }
             toggleInputMethod();
         };
 
