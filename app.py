@@ -111,6 +111,9 @@ def index():
             return redirect(request.url)
 
         mode = request.form.get('mode', 'seg')
+        display_columns = int(request.form.get('display_columns', 3))
+        if display_columns < 1 or display_columns > 4:
+            display_columns = 3
         categories_raw = request.form.get('categories', '')
         chart_option = (request.form.get('chart_option') or '').strip().lower()
         if chart_option not in ('pie', 'bar', 'line'):
@@ -153,9 +156,8 @@ def index():
             cat_percentage = (cat_total / total_matched_occurrences * 100) if total_matched_occurrences > 0 else 0
             category_stats[cat_name] = {'total': cat_total, 'percentage': cat_percentage}
 
-        # 针对 search 模式，进行两列平衡分配（基于匹配词数量）
-        left_items = []
-        right_items = []
+        # 针对 search 模式，进行动态列平衡分配（基于匹配词数量）
+        columns_data = []
         if mode == 'search':
             # 构建列表，每个元素为 (keyword, matches, weight)
             items = []
@@ -164,19 +166,19 @@ def index():
                 items.append((kw, matches, weight))
             # 按权重降序排序
             items.sort(key=lambda x: x[2], reverse=True)
-            left_weight = 0
-            right_weight = 0
+
+            # 初始化列
+            columns_data = [[] for _ in range(display_columns)]
+            column_weights = [0] * display_columns
+
+            # 分配到权重最小的列
             for kw, matches, w in items:
-                if left_weight <= right_weight:
-                    left_items.append((kw, matches))
-                    left_weight += w
-                else:
-                    right_items.append((kw, matches))
-                    right_weight += w
+                min_weight_idx = column_weights.index(min(column_weights))
+                columns_data[min_weight_idx].append((kw, matches))
+                column_weights[min_weight_idx] += w
         else:
             # 非 search 模式，保持原有单列显示
-            left_items = None
-            right_items = None
+            columns_data = None
 
         # 词频占比图数据：只按关键词占比，[关键词, 总次数] 列表
         chart_data = None
@@ -201,8 +203,8 @@ def index():
                                categories_raw=categories_raw,
                                category_stats=category_stats,
                                total_matched_occurrences=total_matched_occurrences,
-                               left_items=left_items,
-                               right_items=right_items,
+                               columns_data=columns_data,
+                               display_columns=display_columns,
                                generate_chart=generate_chart,
                                chart_type=chart_type,
                                chart_option=chart_option if generate_chart else '',
