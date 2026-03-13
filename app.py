@@ -210,7 +210,13 @@ def index():
                                chart_option=chart_option if generate_chart else '',
                                chart_data=chart_data)
 
-    return render_template('index.html', mode=None, results=None, chart_option='pie')
+    return render_template(
+        'index.html', 
+        mode=None, 
+        results=None, 
+        chart_option='pie',
+        chart_type='pie'  # 补充这个变量，值根据你的需求调整（比如 pie/bar/line 等）
+    )
 
 
 if __name__ == '__main__':
