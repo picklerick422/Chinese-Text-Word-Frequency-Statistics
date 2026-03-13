@@ -1546,6 +1546,11 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Polyfill for older browsers that do not support NodeList.forEach (e.g. some WebViews / IE11)
+        if (window.NodeList && !NodeList.prototype.forEach) {
+            NodeList.prototype.forEach = Array.prototype.forEach;
+        }
+
         // 主题管理（自动 / 深色 / 浅色）
         (function () {
             const STORAGE_KEY = 'theme-mode';
@@ -1817,7 +1822,12 @@
 
         window.onload = function() {
             // 加载紧凑模式设置
-            const savedCompact = localStorage.getItem('compactMode') === 'true';
+            let savedCompact = false;
+            try {
+                savedCompact = localStorage.getItem('compactMode') === 'true';
+            } catch (e) {
+                savedCompact = false;
+            }
             const compactCheckbox = document.getElementById('compactMode');
             if (compactCheckbox) {
                 compactCheckbox.checked = savedCompact;
