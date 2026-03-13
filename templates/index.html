@@ -2181,7 +2181,7 @@
                 for (let i = 0; i < values.length; i++) {
                     backgroundColors.push(defaultColors[i % defaultColors.length]);
                 }
-                const chartType = {{ chart_type | tojson }};
+                const chartType = {{ chart_type | default('pie') | tojson }};
                 const dataset = chartType === 'pie' || chartType === 'doughnut'
                     ? { data: values, backgroundColor: backgroundColors, borderColor: isDark ? '#1e293b' : '#fff', borderWidth: 2 }
                     : { label: '出现次数', data: values, backgroundColor: 'rgba(59,130,246,0.6)', borderColor: '#3b82f6', borderWidth: 1 };
