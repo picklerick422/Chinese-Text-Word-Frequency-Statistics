@@ -3,17 +3,12 @@ import jieba
 from flask import Flask, request, render_template, flash, redirect, url_for
 from collections import Counter
 from docx import Document
-import os
 
 # 预加载 jieba 词典
 jieba.initialize()
 
-# ========== 关键修改1：明确静态文件路径（避免部署时路径错乱） ==========
-app = Flask(__name__, 
-            static_folder='static',  # 明确静态文件目录（默认就是static，显式声明更稳妥）
-            static_url_path='/static')  # 静态文件访问URL前缀（必须以/开头）
-
-app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'your-random-secret-key-123456')  # 建议从环境变量读取密钥
+app = Flask(__name__)
+app.secret_key = 'your-secret-key-here'  # 请修改为随机字符串
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 限制上传文件 16MB
 
 
@@ -225,9 +220,9 @@ def index():
 
 
 if __name__ == '__main__':
-    # 本地调试启动（仅开发环境使用）
-    # ========== 关键修改2：禁用生产环境的debug模式 ==========
-    # 本地调试：FLASK_DEBUG=1，生产环境：FLASK_DEBUG=0（强制）
-    DEBUG = os.environ.get('FLASK_DEBUG', '0') == '1'
+    # 生产环境通常使用 Gunicorn 或其它 WSGI 服务器启动，
+    # 下面的配置仅用于本地调试。
+    import os
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=DEBUG)
+    debug_mode = os.environ.get('FLASK_DEBUG', '1') == '1'
+    app.run(host='0.0.0.0', port=port, debug=debug_mode)

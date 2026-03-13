@@ -1447,8 +1447,8 @@
                 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
                 <script>
                 (function() {
-                    var chartData = {{ chart_data|default([])|tojson }};
-                    var chartType = {{ chart_type|default('pie')|tojson }};
+                    var chartData = {{ chart_data|default('[]')|tojson }};
+                    var chartType = {{ chart_type|default('"pie"')|tojson }}; // 强制字符串兜底
                     var labels = chartData.map(function(x) { return x[0]; });
                     var values = chartData.map(function(x) { return x[1]; });
                     var total = values.reduce(function(a,b){ return a+b; }, 0);
@@ -1620,7 +1620,8 @@
                 const cards = Array.from(row.querySelectorAll('.card'));
                 // clear row
                 row.innerHTML = '';
-                const colClass = 'col-md-' + Math.floor(12 / columns);
+                const colCount = Math.max(1, columns); // 确保列数至少为 1
+                const colClass = 'col-md-' + Math.floor(12 / colCount);
                 const cols = [];
                 for (let i = 0; i < columns; i++) {
                     const div = document.createElement('div');
@@ -1646,7 +1647,8 @@
                 // 调整 bootstrap 列宽
                 const row = document.querySelector('.stats-results');
                 if (!row) return;
-                const colClass = 'col-md-' + Math.floor(12 / columns);
+                const colCount = Math.max(1, columns); // 确保列数至少为 1
+                const colClass = 'col-md-' + Math.floor(12 / colCount);
                 row.querySelectorAll('[class*="col-md-"]').forEach(div => {
                     // remove existing col-md-*
                     div.className = div.className.replace(/col-md-\d+/g, '').trim();
@@ -1663,8 +1665,11 @@
                 if (columnSelect) {
                     columnSelect.value = columns;
                 }
-                updateColumnsLayout(columns);
-                updateFourColsClass(columns);
+                // 延迟 100ms 执行，确保统计结果 DOM 已生成
+                setTimeout(() => {
+                    updateColumnsLayout(columns);
+                    updateFourColsClass(columns);
+                }, 100);
             }
 
             // 初始应用一次
@@ -1844,7 +1849,7 @@
 
         function copyTableAsMarkdown() {
             let markdown = '';
-            const mode = '{{ mode|default('') }}'; // 从模板传递
+            const mode = {{ mode|default('')|tojson }}; // 用 tojson 确保是合法 JS 字符串
 
             if (mode === 'search') {
                 // 从卡片中提取数据
@@ -1908,7 +1913,7 @@
 
         function copyTableAsText() {
             let text = '';
-            const mode = '{{ mode|default('') }}'; // 从模板传递
+            const mode = {{ mode|default('')|tojson }}; // 用 tojson 确保是合法 JS 字符串
 
             if (mode === 'search') {
                 // 从卡片中提取数据
@@ -1979,12 +1984,12 @@
         }
 
         // ========== 悬浮/长按删除词功能 ==========
-        document.addEventListener('DOMContentLoaded', function() {
+        window.addEventListener('load', function() {
             // 全局数据存储（确保删除后数据统一）
             const globalData = {
-                totalOccurrences: {{ total_matched_occurrences|default(0) }},
-                originalChartData: {{ chart_data | tojson if generate_chart and chart_data else '[]' }},
-                currentChartData: JSON.parse(JSON.stringify({{ chart_data | tojson if generate_chart and chart_data else '[]' }})),
+                totalOccurrences: {{ total_matched_occurrences|default(0)|tojson }},
+                originalChartData: {{ chart_data|default([])|tojson }},
+                currentChartData: JSON.parse(JSON.stringify({{ chart_data|default([])|tojson }})),
                 deletedWords: [] // 记录已删除的词
             };
 
@@ -2078,7 +2083,7 @@
                     const item = el.closest('[data-word]');
                     if (item) {
                         const itemCount = parseInt(item.dataset.count);
-                        const percent = globalData.totalOccurrences > 0 
+                        const percent = (globalData.totalOccurrences && globalData.totalOccurrences > 0) 
                             ? (itemCount / globalData.totalOccurrences * 100).toFixed(2) 
                             : 0;
                         
@@ -2097,7 +2102,9 @@
                 const cards = document.querySelectorAll('.card');
                 cards.forEach(card => {
                     const header = card.querySelector('.card-header');
-                    if (header && header.textContent.includes(`关键词 “${keyword}”`)) {
+                    // 同时匹配中文引号 “” 和英文引号 ""
+                    const kwMatchStr = `关键词 ${['“', '"'].map(q => q + keyword + q).join('|')}`;
+                    if (header && (header.textContent.includes(`关键词 “${keyword}”`) || header.textContent.includes(`关键词 "${keyword}"`))) {
                         // 重新计算组内总次数（遍历剩余项）
                         const items = card.querySelectorAll(`.list-group-item[data-keyword="${keyword}"]`);
                         let newGroupTotal = 0;
@@ -2115,7 +2122,7 @@
                         // 更新组内占比
                         const groupPercentEl = card.querySelector('.group-percent');
                         if (groupPercentEl) {
-                            const percent = globalData.totalOccurrences > 0 
+                            const percent = (globalData.totalOccurrences && globalData.totalOccurrences > 0) 
                                 ? (newGroupTotal / globalData.totalOccurrences * 100).toFixed(2) 
                                 : 0;
                             groupPercentEl.textContent = `${percent}%`;
@@ -2138,7 +2145,7 @@
                 const newChartData = [];
                 
                 // 分模式处理：search模式 / exact/seg模式
-                const mode = '{{ mode|default('') }}';
+                const mode = {{ mode|default('')|tojson }};
                 if (mode === 'search') {
                     // search模式：按关键词分组统计
                     const cards = document.querySelectorAll('.stats-results .card');
