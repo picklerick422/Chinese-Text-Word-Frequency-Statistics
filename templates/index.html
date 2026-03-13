@@ -579,15 +579,46 @@
             display: flex;
             flex-direction: column;
         }
-        /* 四列时标题和图标保留在同一行，并将匹配词数徽章靠右 */
+        /* 四列时标题排版：图标+标题同行，徽章单独第二行 */
         .stats-results .card-header.four-cols {
+            display: flex;
+            flex-direction: column; /* 整体垂直排列 */
+            align-items: flex-start; /* 左对齐 */
+            justify-content: flex-start;
+            gap: 0.3rem; /* 标题和徽章的行间距 */
+            padding-bottom: 0.5rem;
+        }
+
+        /* 图标+标题 横向排列 */
+        .stats-results .card-header.four-cols .header-title {
+            display: flex;
+            align-items: center; /* 图标和文字垂直居中 */
+            gap: 0.5rem; /* 图标和文字的间距 */
+        }
+
+        /* 徽章区域样式 */
+        .stats-results .card-header.four-cols .header-badge {
+            align-self: flex-start; /* 左对齐 */
+            margin-left: 0;
+        }
+
+        /* 非四列模式保持原有样式 */
+        .stats-results .card-header:not(.four-cols) {
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 0.5rem;
         }
-        .stats-results .card-header.four-cols .keyword-badge {
+
+        /* 非四列模式下隐藏嵌套容器（保持兼容） */
+        .stats-results .card-header:not(.four-cols) .header-title,
+        .stats-results .card-header:not(.four-cols) .header-badge {
+            display: inline;
+        }
+
+        .stats-results .card-header:not(.four-cols) .keyword-badge {
             margin-top: 0;
+            margin-left: 0.5rem;
         }
         /* 统计头部对齐 */
         .stats-header h2 {
@@ -777,7 +808,7 @@
         /* 紧凑模式激活时 - 强制两列同行 */
         .compact-mode .compact-row .compact-col {
             flex: 1 1 calc(50% - 0.5rem) !important; /* 强制等分 */
-            max-width: calc(50% - 0.5rem) !important;
+            max-width: calc(100%) !important;
             min-width: calc(50% - 0.5rem) !important; /* 防止缩小导致换行 */
             margin-bottom: 0;
         }
@@ -993,6 +1024,53 @@
                 margin-bottom: 0;
             }
         }
+
+        /* 新增：删除按钮样式 */
+        .delete-btn {
+            display: none;
+            background: #ef4444;
+            border: none;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            padding: 0;
+            cursor: pointer;
+            transition: all 0.2s;
+            z-index: 10;
+        }
+        .delete-btn:hover {
+            background: #dc2626;
+            transform: scale(1.1);
+        }
+        .list-group-item {
+            position: relative;
+        }
+        .list-group-item:hover .delete-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* 移动端长按显示删除按钮 */
+        .list-group-item.long-press .delete-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* 调整列表项布局，为删除按钮留出空间 */
+        .list-group-item .item-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+        /* 深色模式下删除按钮样式 */
+        body[data-theme="dark"] .delete-btn {
+            background: #b91c1c;
+        }
+        body[data-theme="dark"] .delete-btn:hover {
+            background: #991b1b;
+        }
     </style>
 </head>
 <body>
@@ -1177,7 +1255,7 @@
 
                 <!-- 紧凑模式布局容器 -->
                 <div class="form-layout-container">
-                    <!-- 文件上传区域 - 简化容器结构 -->
+                    <!-- 文件上传区域 - 移除统计模式选择框 -->
                     <div id="file-area" class="input-area mb-4" {% if input_type == 'text' %}style="display: none;"{% endif %}>
                         <div class="compact-row">
                             <div class="compact-col">
@@ -1185,16 +1263,8 @@
                                     <i class="bi bi-upload me-1"></i> 选择文本文件（UTF-8 编码）或 Word 文档（.docx）
                                 </label>
                                 <input type="file" class="form-control" id="file" name="file" accept=".txt,.docx">
-                            </div>
-                            <div class="compact-col">
-                                <label for="mode" class="form-label">
-                                    <i class="bi bi-sliders2 me-1"></i> 统计模式
-                                </label>
-                                <select class="form-select" id="mode" name="mode">
-                                    <option value="seg" {% if mode == 'seg' %}selected{% endif %}>分词匹配 (seg)</option>
-                                    <option value="exact" {% if mode == 'exact' %}selected{% endif %}>精确匹配 (exact)</option>
-                                    <option value="search" {% if mode == 'search' %}selected{% endif %}>搜索包含关键词的词 (search)</option>
-                                </select>
+                                <!-- 隐藏的统计模式字段（保持表单提交正常） -->
+                                <input type="hidden" id="mode_file_hidden" name="mode" value="seg">
                             </div>
                         </div>
                     </div>
@@ -1287,20 +1357,30 @@
                                 {% set group_total = matches.values()|sum %}
                                 <div class="card">
                                     <div class="card-header{% if display_columns == 4 %} four-cols{% endif %}">
-                                        <i class="bi bi-tag me-2"></i>关键词 “{{ kw }}”
-                                        <span class="keyword-badge">{{ matches|length }} 个匹配词</span>
+                                        <div class="header-title">
+                                            <i class="bi bi-tag me-2"></i>关键词 “{{ kw }}”
+                                        </div>
+                                        <div class="header-badge">
+                                            <span class="keyword-badge">{{ matches|length }} 个匹配词</span>
+                                        </div>
                                     </div>
                                     <div class="card-body">
-                                        <p class="mb-2">组内总次数：{{ group_total }} (全局占比：{{ "%.2f"|format(group_total / total_matched_occurrences * 100) }}%)</p>
+                                        <p class="mb-2">组内总次数：<span class="group-total">{{ group_total }}</span> (全局占比：<span class="group-percent">{{ "%.2f"|format(group_total / total_matched_occurrences * 100) }}%</span>)</p>
                                         <ul class="list-group list-group-flush">
                                             {% if matches %}
                                                 {% for word, cnt in matches.items() %}
-                                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                                        <span>{{ word }}</span>
-                                                        <span>
-                                                            <span class="badge bg-primary rounded-pill me-2">{{ cnt }}</span>
-                                                            <small class="text-muted">{{ "%.2f"|format(cnt / total_matched_occurrences * 100) }}%</small>
-                                                        </span>
+                                                    <li class="list-group-item d-flex justify-content-between align-items-center" data-keyword="{{ kw }}" data-word="{{ word }}" data-count="{{ cnt }}">
+                                                        <!-- 新增删除按钮 -->
+                                                        <button class="delete-btn" aria-label="删除此词">
+                                                            <i class="bi bi-x"></i>
+                                                        </button>
+                                                        <div class="item-content">
+                                                            <span class="word-text">{{ word }}</span>
+                                                            <span>
+                                                                <span class="badge bg-primary rounded-pill me-2 count-text">{{ cnt }}</span>
+                                                                <small class="text-muted percent-text">{{ "%.2f"|format(cnt / total_matched_occurrences * 100) }}%</small>
+                                                            </span>
+                                                        </div>
                                                     </li>
                                                 {% endfor %}
                                             {% else %}
@@ -1328,8 +1408,13 @@
                             </thead>
                             <tbody>
                                 {% for word, count in results.items() %}
-                                <tr>
-                                    <td>{{ word }}</td>
+                                <tr data-word="{{ word }}" data-count="{{ count }}">
+                                    <td>
+                                        <button class="delete-btn" style="position:absolute; left: 10px;" aria-label="删除此词">
+                                            <i class="bi bi-x"></i>
+                                        </button>
+                                        {{ word }}
+                                    </td>
                                     <td><span class="badge bg-primary rounded-pill">{{ count }}</span></td>
                                 </tr>
                                 {% endfor %}
@@ -1344,9 +1429,15 @@
                 <div class="chart-section mt-4">
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
                         <h3 class="h5 mb-0"><i class="bi bi-pie-chart me-2"></i>关键词占比图</h3>
-                        <button type="button" class="btn btn-outline-secondary btn-sm" id="downloadChartBtn">
-                            <i class="bi bi-download me-1"></i>下载图表
-                        </button>
+                        <div class="chart-actions">
+                            <button type="button" class="btn btn-outline-secondary btn-sm me-2" id="downloadChartBtn">
+                                <i class="bi bi-download me-1"></i>下载图表
+                            </button>
+                            <!-- 新增重新生成按钮 -->
+                            <button type="button" class="btn btn-primary btn-sm" id="regenerateChartBtn">
+                                <i class="bi bi-arrow-clockwise me-1"></i>重新生成
+                            </button>
+                        </div>
                     </div>
                     <div class="chart-container">
                         <canvas id="wordFreqChart"></canvas>
@@ -1675,8 +1766,8 @@
             const formLayout = document.querySelector('.form-layout-container');
             const fileInput = document.getElementById('file');
             const textInput = document.getElementById('direct_text');
-            const modeFile = document.getElementById('mode');
             const modeText = document.getElementById('mode_text');
+            const modeFileHidden = document.getElementById('mode_file_hidden');
 
             if (fileRadio.checked) {
                 fileArea.style.display = 'block';
@@ -1687,8 +1778,9 @@
                 }
                 fileInput.disabled = false;
                 textInput.disabled = true;
-                if (modeFile && modeText) {
-                    modeFile.value = modeText.value;
+                // 同步统计模式到隐藏字段
+                if (modeFileHidden && modeText) {
+                    modeFileHidden.value = modeText.value;
                 }
             } else {
                 fileArea.style.display = 'none';
@@ -1699,12 +1791,9 @@
                 }
                 fileInput.disabled = true;
                 textInput.disabled = false;
-                if (modeFile && modeText) {
-                    modeText.value = modeFile.value;
-                }
             }
 
-            // 强制重绘，确保 flex 布局生效
+            // 强制重绘，确保布局生效
             setTimeout(() => {
                 if (formLayout) {
                     const computedStyle = window.getComputedStyle(formLayout);
@@ -1712,7 +1801,6 @@
                 }
             }, 0);
         }
-
         function toggleCompactMode() {
             const isCompact = document.getElementById('compactMode').checked;
             const formLayout = document.querySelector('.form-layout-container');
@@ -1879,6 +1967,264 @@
                 alert('复制失败，请手动复制。');
             });
         }
+
+        // ========== 悬浮/长按删除词功能 ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            // 全局数据存储（确保删除后数据统一）
+            const globalData = {
+                totalOccurrences: {{ total_matched_occurrences }},
+                originalChartData: {{ chart_data | tojson if generate_chart and chart_data else '[]' }},
+                currentChartData: JSON.parse(JSON.stringify({{ chart_data | tojson if generate_chart and chart_data else '[]' }})),
+                deletedWords: [] // 记录已删除的词
+            };
+
+            // 初始化长按事件（移动端）
+            initLongPressEvents();
+
+            // 绑定删除按钮点击事件
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.delete-btn')) {
+                    const btn = e.target.closest('.delete-btn');
+                    const item = btn.closest('[data-word]');
+                    if (item) {
+                        // 确认删除
+                        if (confirm(`确定要删除「${item.dataset.word}」吗？`)) {
+                            deleteWord(item);
+                        }
+                    }
+                }
+            });
+
+            // 绑定重新生成图表按钮事件
+            const regenerateBtn = document.getElementById('regenerateChartBtn');
+            if (regenerateBtn) {
+                regenerateBtn.addEventListener('click', function() {
+                    regenerateChart();
+                    // 按钮反馈
+                    this.innerHTML = '<i class="bi bi-check me-1"></i>生成成功';
+                    setTimeout(() => {
+                        this.innerHTML = '<i class="bi bi-arrow-clockwise me-1"></i>重新生成';
+                    }, 1500);
+                });
+            }
+
+            // 初始化长按事件
+            function initLongPressEvents() {
+                let pressTimer = null;
+                const listItems = document.querySelectorAll('.list-group-item, tr[data-word]');
+                
+                listItems.forEach(item => {
+                    // 触摸开始
+                    item.addEventListener('touchstart', function(e) {
+                        e.preventDefault();
+                        pressTimer = setTimeout(() => {
+                            this.classList.add('long-press');
+                        }, 500); // 长按500ms触发
+                    });
+
+                    // 触摸结束/离开
+                    ['touchend', 'touchcancel', 'touchmove'].forEach(event => {
+                        item.addEventListener(event, function() {
+                            clearTimeout(pressTimer);
+                            this.classList.remove('long-press');
+                        });
+                    });
+                });
+            }
+
+            // 删除词语并重新计算（核心修复）
+            function deleteWord(item) {
+                const word = item.dataset.word;
+                const count = parseInt(item.dataset.count);
+                const keyword = item.dataset.keyword;
+
+                // 记录已删除的词
+                globalData.deletedWords.push({ word, count, keyword });
+                
+                // 1. 从DOM中移除元素
+                item.remove();
+
+                // 2. 更新全局总次数
+                globalData.totalOccurrences -= count;
+
+                // 3. 更新所有词的占比
+                updateAllPercentages();
+
+                // 4. 从图表数据中移除（标记为已删除，等待重新生成）
+                globalData.currentChartData = globalData.currentChartData.filter(item => item[0] !== word);
+
+                // 5. 更新关键词组的统计信息（修复中文引号匹配问题）
+                if (keyword) {
+                    updateKeywordGroupStats(keyword);
+                }
+            }
+
+            // 更新所有占比显示
+            function updateAllPercentages() {
+                // 遍历所有计数元素
+                const countElements = document.querySelectorAll('.count-text');
+                
+                countElements.forEach(el => {
+                    const item = el.closest('[data-word]');
+                    if (item) {
+                        const itemCount = parseInt(item.dataset.count);
+                        const percent = globalData.totalOccurrences > 0 
+                            ? (itemCount / globalData.totalOccurrences * 100).toFixed(2) 
+                            : 0;
+                        
+                        // 更新占比文本
+                        const percentEl = item.querySelector('.percent-text');
+                        if (percentEl) {
+                            percentEl.textContent = `${percent}%`;
+                        }
+                    }
+                });
+            }
+
+            // 更新关键词组的统计信息（核心修复：中文引号匹配）
+            function updateKeywordGroupStats(keyword) {
+                // 找到对应关键词的卡片（修复：匹配中文引号 “”）
+                const cards = document.querySelectorAll('.card');
+                cards.forEach(card => {
+                    const header = card.querySelector('.card-header');
+                    if (header && header.textContent.includes(`关键词 “${keyword}”`)) {
+                        // 重新计算组内总次数（遍历剩余项）
+                        const items = card.querySelectorAll(`.list-group-item[data-keyword="${keyword}"]`);
+                        let newGroupTotal = 0;
+                        
+                        items.forEach(item => {
+                            newGroupTotal += parseInt(item.dataset.count);
+                        });
+
+                        // 更新组内总次数显示
+                        const groupTotalEl = card.querySelector('.group-total');
+                        if (groupTotalEl) {
+                            groupTotalEl.textContent = newGroupTotal;
+                        }
+                        
+                        // 更新组内占比
+                        const groupPercentEl = card.querySelector('.group-percent');
+                        if (groupPercentEl) {
+                            const percent = globalData.totalOccurrences > 0 
+                                ? (newGroupTotal / globalData.totalOccurrences * 100).toFixed(2) 
+                                : 0;
+                            groupPercentEl.textContent = `${percent}%`;
+                        }
+
+                        // 更新匹配词数量
+                        const badge = card.querySelector('.keyword-badge');
+                        if (badge) {
+                            badge.textContent = `${items.length} 个匹配词`;
+                        }
+                    }
+                });
+            }
+
+            // 重新生成图表核心逻辑
+            function regenerateChart() {
+                if (!window.wordFreqChartInstance) return;
+
+                // 重新收集当前页面的有效数据（基于删除后的实际显示）
+                const newChartData = [];
+                
+                // 分模式处理：search模式 / exact/seg模式
+                const mode = '{{ mode }}';
+                if (mode === 'search') {
+                    // search模式：按关键词分组统计
+                    const cards = document.querySelectorAll('.stats-results .card');
+                    cards.forEach(card => {
+                        const header = card.querySelector('.card-header');
+                        if (header) {
+                            // 提取关键词（如：关键词 “曹操” → 曹操）
+                            const kwMatch = header.textContent.match(/关键词 “([^”]+)”/);
+                            if (kwMatch && kwMatch[1]) {
+                                const kw = kwMatch[1];
+                                const groupTotalEl = card.querySelector('.group-total');
+                                if (groupTotalEl) {
+                                    const total = parseInt(groupTotalEl.textContent) || 0;
+                                    newChartData.push([kw, total]);
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    // exact/seg模式：直接读取表格数据
+                    const rows = document.querySelectorAll('tr[data-word]');
+                    rows.forEach(row => {
+                        const word = row.dataset.word;
+                        const count = parseInt(row.dataset.count) || 0;
+                        newChartData.push([word, count]);
+                    });
+                }
+
+                // 过滤掉次数为0的项
+                const filteredData = newChartData.filter(item => item[1] > 0);
+                const labels = filteredData.map(item => item[0]);
+                const values = filteredData.map(item => item[1]);
+                const total = values.reduce((a, b) => a + b, 0);
+
+                // 销毁现有图表
+                window.wordFreqChartInstance.destroy();
+
+                // 注册插件
+                if (typeof Chart !== 'undefined' && window.ChartDataLabels) {
+                    Chart.register(window.ChartDataLabels);
+                }
+
+                // 获取主题模式
+                const themeMode = (typeof localStorage !== 'undefined' && localStorage.getItem('theme-mode')) || 'auto';
+                const isDark = themeMode === 'dark' || (themeMode === 'auto' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                const textColor = isDark ? '#e2e8f0' : '#334155';
+                const gridColor = isDark ? 'rgba(148,163,184,0.2)' : 'rgba(148,163,184,0.3)';
+                const defaultColors = ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#84cc16'];
+                const backgroundColors = [];
+                for (let i = 0; i < values.length; i++) {
+                    backgroundColors.push(defaultColors[i % defaultColors.length]);
+                }
+                const chartType = {{ chart_type | tojson }};
+                const dataset = chartType === 'pie' || chartType === 'doughnut'
+                    ? { data: values, backgroundColor: backgroundColors, borderColor: isDark ? '#1e293b' : '#fff', borderWidth: 2 }
+                    : { label: '出现次数', data: values, backgroundColor: 'rgba(59,130,246,0.6)', borderColor: '#3b82f6', borderWidth: 1 };
+                const config = {
+                    type: chartType,
+                    data: {
+                        labels: labels,
+                        datasets: [dataset]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: chartType === 'pie', labels: { color: textColor } },
+                            tooltip: { callbacks: { label: function(ctx) {
+                                const v = ctx.raw || 0;
+                                const pct = total ? (v/total*100).toFixed(2) : 0;
+                                return v + ' 次 (' + pct + '%)';
+                            }}},
+                            datalabels: {
+                                display: true,
+                                color: chartType === 'pie' ? '#fff' : textColor,
+                                font: { size: chartType === 'pie' ? 13 : 12, weight: 'bold' },
+                                formatter: function(value) {
+                                    const pct = total ? (value / total * 100).toFixed(1) : 0;
+                                    return pct + '%';
+                                },
+                                anchor: chartType === 'pie' ? 'center' : 'end',
+                                align: chartType === 'pie' ? 'center' : 'top',
+                                clamp: true,
+                                padding: chartType === 'pie' ? 2 : 4
+                            }
+                        },
+                        scales: chartType === 'pie' ? {} : {
+                            x: { ticks: { color: textColor, maxRotation: 45 }, grid: { color: gridColor } },
+                            y: { ticks: { color: textColor }, grid: { color: gridColor } }
+                        }
+                    }
+                };
+                const ctx = document.getElementById('wordFreqChart').getContext('2d');
+                window.wordFreqChartInstance = new Chart(ctx, config);
+            }
+        });
     </script>
 </body>
 </html>
