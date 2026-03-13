@@ -112,6 +112,11 @@ def index():
 
         mode = request.form.get('mode', 'seg')
         categories_raw = request.form.get('categories', '')
+        chart_option = (request.form.get('chart_option') or '').strip().lower()
+        if chart_option not in ('pie', 'bar', 'line'):
+            chart_option = ''
+        generate_chart = chart_option in ('pie', 'bar', 'line')
+        chart_type = chart_option if generate_chart else 'pie'
 
         # 计时并执行统计
         start = time.perf_counter()
@@ -173,6 +178,18 @@ def index():
             left_items = None
             right_items = None
 
+        # 词频占比图数据：只按关键词占比，[关键词, 总次数] 列表
+        chart_data = None
+        if generate_chart and results:
+            if mode == 'search':
+                # 每个关键词下匹配词的总次数
+                chart_data = [(kw, sum(matches.values())) for kw, matches in results.items()]
+            else:
+                # exact/seg：results 已是 关键词 -> 次数
+                chart_data = list(results.items())
+            chart_data = sorted(chart_data, key=lambda x: x[1], reverse=True)
+            chart_data = [[k, c] for k, c in chart_data]
+
         return render_template('index.html',
                                mode=mode,
                                results=results,
@@ -185,9 +202,13 @@ def index():
                                category_stats=category_stats,
                                total_matched_occurrences=total_matched_occurrences,
                                left_items=left_items,
-                               right_items=right_items)
+                               right_items=right_items,
+                               generate_chart=generate_chart,
+                               chart_type=chart_type,
+                               chart_option=chart_option if generate_chart else '',
+                               chart_data=chart_data)
 
-    return render_template('index.html', mode=None, results=None)
+    return render_template('index.html', mode=None, results=None, chart_option='pie')
 
 
 if __name__ == '__main__':

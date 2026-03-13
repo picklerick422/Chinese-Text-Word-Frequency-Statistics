@@ -65,6 +65,25 @@
             resize: vertical;
             min-height: 120px;
         }
+        
+        /* 文件选择按钮样式，与表单控件圆角一致 */
+        input[type="file"].form-control::file-selector-button,
+        input[type="file"].form-control::-webkit-file-upload-button {
+            border-radius: 1rem;
+            border: 2px solid #e2e8f0;
+            background: white;
+            color: #334155;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        input[type="file"].form-control::file-selector-button:hover,
+        input[type="file"].form-control::-webkit-file-upload-button:hover {
+            border-color: #3b82f6;
+            background: #f8fafc;
+        }
+        
         .btn-primary {
             background: linear-gradient(145deg, #3b82f6, #2563eb);
             border: none;
@@ -253,10 +272,214 @@
             color: #059669;
             margin-left: 1rem;
         }
+        .chart-section {
+            padding: 1.25rem;
+            background: #f8fafc;
+            border-radius: 1.5rem;
+            border: 1px solid #e2e8f0;
+        }
+        .chart-container {
+            position: relative;
+            height: 380px;
+            width: 100%;
+        }
+        .chart-container canvas {
+            max-width: 100%;
+        }
+        body[data-theme="dark"] .chart-section {
+            background: #1e293b;
+            border-color: #334155;
+        }
         .category-table-section {
             margin-top: 2rem;
             padding-top: 1.5rem;
             border-top: 2px dashed #cbd5e1;
+        }
+
+        /* 公告栏：紧贴设置图标右侧，滚动显示，点击打开弹窗 */
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .announcement-wrap {
+            min-width: 0;
+            max-width: 260px;
+            display: flex;
+            align-items: center;
+        }
+        .announcement-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            width: 100%;
+            height: 2.25rem;
+            padding: 0 0.75rem;
+            background: rgba(59, 130, 246, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 1rem;
+            cursor: pointer;
+            overflow: hidden;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .announcement-bar:hover {
+            background: rgba(59, 130, 246, 0.14);
+            border-color: rgba(59, 130, 246, 0.35);
+        }
+        .announcement-bar i {
+            color: #3b82f6;
+            flex-shrink: 0;
+        }
+        .announcement-scroll-box {
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+        }
+        .announcement-scroll-text {
+            display: inline-block;
+            white-space: nowrap;
+            color: #334155;
+            font-size: 0.875rem;
+            padding-left: 100%;
+            animation: announcement-scroll 18s linear infinite;
+        }
+        @keyframes announcement-scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+        .announcement-bar:hover .announcement-scroll-text {
+            animation-play-state: paused;
+        }
+        /* 公告弹窗（居中遮罩） */
+        .announcement-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            z-index: 1040;
+        }
+        .announcement-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .announcement-modal {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) scale(0.96);
+            max-width: 520px;
+            width: calc(100% - 2rem);
+            max-height: 85vh;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(59, 130, 246, 0.06);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            z-index: 1050;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .announcement-modal.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+            pointer-events: auto;
+        }
+        .announcement-modal-header {
+            padding: 1.1rem 1.35rem;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(59, 130, 246, 0.02) 100%);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        .announcement-modal-title {
+            margin: 0;
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .announcement-modal-title i {
+            color: #3b82f6;
+        }
+        .announcement-close-btn {
+            background: rgba(241, 245, 249, 0.8);
+            border: none;
+            padding: 0.4rem;
+            color: #64748b;
+            cursor: pointer;
+            border-radius: 0.6rem;
+            transition: color 0.2s, background 0.2s, transform 0.15s;
+        }
+        .announcement-close-btn:hover {
+            color: #0f172a;
+            background: #e2e8f0;
+            transform: scale(1.05);
+        }
+        .announcement-modal-body {
+            padding: 1.35rem 1.5rem;
+            overflow-y: auto;
+            font-size: 0.9375rem;
+            line-height: 1.7;
+            color: #334155;
+        }
+        .announcement-modal-body .announce-section {
+            margin-bottom: 1.5rem;
+        }
+        .announcement-modal-body .announce-section:last-child {
+            margin-bottom: 0;
+        }
+        .announcement-modal-body .announce-section-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #64748b;
+            margin-bottom: 0.65rem;
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+        }
+        .announcement-modal-body .announce-section-title i {
+            color: #3b82f6;
+            font-size: 0.9rem;
+        }
+        .announcement-modal-body .announce-card {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            padding: 0.9rem 1rem;
+            margin-bottom: 0.75rem;
+        }
+        .announcement-modal-body .announce-card:last-child {
+            margin-bottom: 0;
+        }
+        .announcement-modal-body .announce-card strong {
+            color: #1e293b;
+        }
+        .announcement-modal-body ul {
+            margin: 0.4rem 0 0 1.1rem;
+            padding: 0;
+        }
+        .announcement-modal-body ul li {
+            margin-bottom: 0.35rem;
+        }
+        .announcement-modal-body ul li:last-child {
+            margin-bottom: 0;
+        }
+        .announcement-modal-body p {
+            margin: 0 0 0.6rem 0;
+        }
+        .announcement-modal-body p:last-child {
+            margin-bottom: 0;
         }
 
         /* 右上角设置面板（替代 Bootstrap 模态框，更轻量） */
@@ -493,6 +716,19 @@
             border-color: #3b82f6;
             box-shadow: 0 0 0 4px rgba(59,130,246,0.3);
         }
+        body[data-theme="dark"] input[type="file"].form-control::file-selector-button,
+        body[data-theme="dark"] input[type="file"].form-control::-webkit-file-upload-button {
+            background: linear-gradient(145deg, #2563eb, #1d4ed8);
+            color: #e2e8f0;
+            border-radius: 1rem;
+            box-shadow: 0 4px 12px -4px rgba(0,0,0,0.3);
+        }
+        body[data-theme="dark"] input[type="file"].form-control::file-selector-button:hover,
+        body[data-theme="dark"] input[type="file"].form-control::-webkit-file-upload-button:hover {
+            background: linear-gradient(145deg, #3b82f6, #2563eb);
+            color: #fff;
+            box-shadow: 0 6px 16px -4px rgba(59,130,246,0.4);
+        }
         body[data-theme="dark"] .btn-outline-secondary {
             color: #cbd5e1;
             border-color: #475569;
@@ -602,22 +838,113 @@
         body[data-theme="dark"] .list-group-item {
             background-color: #1e293b;
         }
+        /* 深色模式：公告栏与公告弹窗 */
+        body[data-theme="dark"] .announcement-bar {
+            background: rgba(59, 130, 246, 0.12);
+            border-color: rgba(59, 130, 246, 0.25);
+        }
+        body[data-theme="dark"] .announcement-bar:hover {
+            background: rgba(59, 130, 246, 0.18);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+        body[data-theme="dark"] .announcement-scroll-text {
+            color: #e2e8f0;
+        }
+        body[data-theme="dark"] .announcement-modal {
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(59, 130, 246, 0.1);
+        }
+        body[data-theme="dark"] .announcement-modal-header {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.04) 100%);
+            border-bottom-color: #334155;
+        }
+        body[data-theme="dark"] .announcement-modal-title {
+            color: #f1f5f9;
+        }
+        body[data-theme="dark"] .announcement-close-btn {
+            color: #94a3b8;
+            background: rgba(51, 65, 85, 0.6);
+        }
+        body[data-theme="dark"] .announcement-close-btn:hover {
+            color: #f1f5f9;
+            background: #334155;
+        }
+        body[data-theme="dark"] .announcement-modal-body {
+            color: #cbd5e1;
+        }
+        body[data-theme="dark"] .announcement-modal-body .announce-section-title {
+            color: #94a3b8;
+        }
+        body[data-theme="dark"] .announcement-modal-body .announce-card {
+            background: rgba(30, 41, 59, 0.6);
+            border-color: #334155;
+        }
+        body[data-theme="dark"] .announcement-modal-body .announce-card strong {
+            color: #e2e8f0;
+        }
     </style>
 </head>
 <body>
+    <!-- 公告弹窗（放在 body 下避免被 main-card 的 backdrop-filter 影响固定定位） -->
+    <div class="announcement-overlay" id="announcementOverlay" aria-hidden="true"></div>
+    <div class="announcement-modal" id="announcementModal" role="dialog" aria-modal="true" aria-labelledby="announcementModalTitle" aria-hidden="true">
+        <div class="announcement-modal-header">
+            <h5 class="announcement-modal-title" id="announcementModalTitle">
+                <i class="bi bi-megaphone-fill"></i>
+                <span>公告</span>
+            </h5>
+            <button type="button" class="announcement-close-btn" id="announcementCloseBtn" aria-label="关闭公告">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="announcement-modal-body" id="announcementModalBody">
+            <div class="announce-section">
+                <div class="announce-section-title"><i class="bi bi-stars"></i> 最新动态</div>
+                <div class="announce-card">
+                    <p><strong>功能更新</strong>：现已支持 Word 文档（.docx）直接上传，自动提取文本进行统计，无需手动复制粘贴。</p>
+                </div>
+                <div class="announce-card">
+                    <p><strong>主题模式</strong>：支持浅色、深色与跟随系统自动切换，在设置中即可一键切换，保护用眼更舒适。</p>
+                </div>
+            </div>
+            <div class="announce-section">
+                <div class="announce-section-title"><i class="bi bi-lightbulb"></i> 使用提示</div>
+                <ul>
+                    <li>文本请使用 UTF-8 编码，避免乱码。</li>
+                    <li>统计结果支持按词频排序，便于快速定位高频词。</li>
+                    <li>可直接在页面内复制表格为 Markdown 或纯文本，方便二次编辑。</li>
+                </ul>
+            </div>
+            <div class="announce-section">
+                <div class="announce-section-title"><i class="bi bi-heart"></i> 致谢</div>
+                <p>感谢您使用本工具。如有问题或建议，欢迎随时反馈，我们会持续优化体验。</p>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <div class="main-card">
             <div class="d-flex align-items-center justify-content-between">
                 <h1>
                     <i class="bi bi-file-text"></i> 中文文本词语统计
                 </h1>
-                <!-- 设置图标，点击打开右上角设置面板 -->
-                <button type="button"
-                        class="btn btn-link p-0"
-                        id="openSettingsBtn"
-                        aria-label="打开设置">
-                    <i class="bi bi-gear fs-3"></i>
-                </button>
+                <div class="header-right">
+                    <div class="announcement-wrap">
+                        <div class="announcement-bar" id="announcementBar" role="button" aria-label="查看公告" title="点击查看公告">
+                            <i class="bi bi-megaphone"></i>
+                            <div class="announcement-scroll-box">
+                                <span class="announcement-scroll-text" id="announcementScrollText">欢迎使用中文文本词语统计 · 支持上传文件或直接输入 · 点击查看完整公告</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 设置图标，点击打开右上角设置面板 -->
+                    <button type="button"
+                            class="btn btn-link p-0"
+                            id="openSettingsBtn"
+                            aria-label="打开设置">
+                        <i class="bi bi-gear fs-3"></i>
+                    </button>
+                </div>
             </div>
 
             <!-- 轻量设置面板 -->
@@ -752,6 +1079,19 @@
                     <textarea class="form-control" id="categories" name="categories" rows="4" placeholder="例如：&#10;曹魏:曹操,曹丕,曹仁&#10;蜀汉:刘备,关羽,张飞">{% if categories_raw %}{{ categories_raw }}{% endif %}</textarea>
                 </div>
 
+                <!-- 词频占比图选项（与统计模式同款选择框） -->
+                <div class="mb-4">
+                    <label for="chart_option" class="form-label">
+                        <i class="bi bi-pie-chart me-1"></i> 词频占比图
+                    </label>
+                    <select class="form-select" id="chart_option" name="chart_option">
+                        <option value="" {% if chart_option == '' %}selected{% endif %}>不生成</option>
+                        <option value="pie" {% if chart_option == 'pie' %}selected{% endif %}>饼状图</option>
+                        <option value="bar" {% if chart_option == 'bar' %}selected{% endif %}>柱状图</option>
+                        <option value="line" {% if chart_option == 'line' %}selected{% endif %}>折线图</option>
+                    </select>
+                </div>
+
                 <div class="d-grid">
                     <button type="submit" class="btn btn-primary" id="submitBtn">
                         <i class="bi bi-calculator me-2"></i>开始统计
@@ -857,6 +1197,91 @@
                             </tbody>
                         </table>
                     </div>
+                {% endif %}
+
+                <!-- 关键词占比图（可选） -->
+                {% if generate_chart and chart_data %}
+                <div class="chart-section mt-4">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                        <h3 class="h5 mb-0"><i class="bi bi-pie-chart me-2"></i>关键词占比图</h3>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" id="downloadChartBtn">
+                            <i class="bi bi-download me-1"></i>下载图表
+                        </button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="wordFreqChart"></canvas>
+                    </div>
+                </div>
+                <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+                <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+                <script>
+                (function() {
+                    var chartData = {{ chart_data | tojson }};
+                    var chartType = {{ chart_type | tojson }};
+                    var labels = chartData.map(function(x) { return x[0]; });
+                    var values = chartData.map(function(x) { return x[1]; });
+                    var total = values.reduce(function(a,b){ return a+b; }, 0);
+                    var themeMode = (typeof localStorage !== 'undefined' && localStorage.getItem('theme-mode')) || 'auto';
+                    var isDark = themeMode === 'dark' || (themeMode === 'auto' && typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                    var textColor = isDark ? '#e2e8f0' : '#334155';
+                    var gridColor = isDark ? 'rgba(148,163,184,0.2)' : 'rgba(148,163,184,0.3)';
+                    var defaultColors = ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#84cc16'];
+                    var backgroundColors = [];
+                    for (var i = 0; i < values.length; i++) {
+                        backgroundColors.push(defaultColors[i % defaultColors.length]);
+                    }
+                    var dataset = chartType === 'pie' || chartType === 'doughnut'
+                        ? { data: values, backgroundColor: backgroundColors, borderColor: isDark ? '#1e293b' : '#fff', borderWidth: 2 }
+                        : { label: '出现次数', data: values, backgroundColor: 'rgba(59,130,246,0.6)', borderColor: '#3b82f6', borderWidth: 1 };
+                    if (typeof Chart !== 'undefined' && window.ChartDataLabels) {
+                        Chart.register(window.ChartDataLabels);
+                    }
+                    var config = {
+                        type: chartType,
+                        data: {
+                            labels: labels,
+                            datasets: [dataset]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: chartType === 'pie', labels: { color: textColor } },
+                                tooltip: { callbacks: { label: function(ctx) {
+                                    var v = ctx.raw || 0;
+                                    var pct = total ? (v/total*100).toFixed(2) : 0;
+                                    return v + ' 次 (' + pct + '%)';
+                                }}},
+                                datalabels: {
+                                    display: true,
+                                    color: chartType === 'pie' ? '#fff' : textColor,
+                                    font: { size: chartType === 'pie' ? 13 : 12, weight: 'bold' },
+                                    formatter: function(value) {
+                                        var pct = total ? (value / total * 100).toFixed(1) : 0;
+                                        return pct + '%';
+                                    },
+                                    anchor: chartType === 'pie' ? 'center' : 'end',
+                                    align: chartType === 'pie' ? 'center' : 'top',
+                                    clamp: true,
+                                    padding: chartType === 'pie' ? 2 : 4
+                                }
+                            },
+                            scales: chartType === 'pie' ? {} : {
+                                x: { ticks: { color: textColor, maxRotation: 45 }, grid: { color: gridColor } },
+                                y: { ticks: { color: textColor }, grid: { color: gridColor } }
+                            }
+                        }
+                    };
+                    var ctx = document.getElementById('wordFreqChart').getContext('2d');
+                    window.wordFreqChartInstance = new Chart(ctx, config);
+                    document.getElementById('downloadChartBtn').addEventListener('click', function() {
+                        var link = document.createElement('a');
+                        link.download = '关键词占比图.png';
+                        link.href = document.getElementById('wordFreqChart').toDataURL('image/png');
+                        link.click();
+                    });
+                })();
+                </script>
                 {% endif %}
 
                 <!-- 可复制统计表区域 - 平衡两列布局 -->
@@ -1104,6 +1529,36 @@
             }
             if (footerCloseBtn) {
                 footerCloseBtn.addEventListener('click', closeSettingsPanel);
+            }
+
+            // 公告栏：点击打开公告弹窗
+            const announcementBar = document.getElementById('announcementBar');
+            const announcementOverlay = document.getElementById('announcementOverlay');
+            const announcementModal = document.getElementById('announcementModal');
+            const announcementCloseBtn = document.getElementById('announcementCloseBtn');
+
+            function openAnnouncementModal() {
+                if (announcementOverlay) announcementOverlay.classList.add('show');
+                if (announcementModal) {
+                    announcementModal.classList.add('show');
+                    announcementModal.setAttribute('aria-hidden', 'false');
+                }
+            }
+            function closeAnnouncementModal() {
+                if (announcementOverlay) announcementOverlay.classList.remove('show');
+                if (announcementModal) {
+                    announcementModal.classList.remove('show');
+                    announcementModal.setAttribute('aria-hidden', 'true');
+                }
+            }
+            if (announcementBar) {
+                announcementBar.addEventListener('click', openAnnouncementModal);
+            }
+            if (announcementCloseBtn) {
+                announcementCloseBtn.addEventListener('click', closeAnnouncementModal);
+            }
+            if (announcementOverlay) {
+                announcementOverlay.addEventListener('click', closeAnnouncementModal);
             }
         })();
 
