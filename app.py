@@ -181,7 +181,7 @@ def index():
             columns_data = None
 
         # 词频占比图数据：只按关键词占比，[关键词, 总次数] 列表
-        chart_data = None
+        chart_data = []
         if generate_chart and results:
             if mode == 'search':
                 # 每个关键词下匹配词的总次数
@@ -213,9 +213,21 @@ def index():
     return render_template(
         'index.html', 
         mode=None, 
-        results=None, 
-        chart_option='pie',
-        chart_type='pie'  # 补充这个变量，值根据你的需求调整（比如 pie/bar/line 等）
+        results=None,
+        total_words=0,
+        elapsed=0,
+        keywords=[],
+        input_type='file',
+        direct_text='',
+        categories_raw='',
+        category_stats={},
+        total_matched_occurrences=0,
+        columns_data=[],
+        display_columns=3,
+        generate_chart=False,
+        chart_type='pie',
+        chart_option='',
+        chart_data=[]
     )
 
 
