@@ -1,21 +1,46 @@
 import time
 import jieba
-from flask import Flask, request, render_template, flash, redirect, url_for
+from flask import Flask, request, render_template, flash, redirect, url_for, session
 from collections import Counter
 from docx import Document
 import os
 
-# 预加载 jieba 词典
-jieba.initialize()
+# 确保Session目录存在（Railway部署必需）
+session_dir = '/tmp/flask_session'
+if not os.path.exists(session_dir):
+    try:
+        os.makedirs(session_dir, exist_ok=True)
+    except Exception as e:
+        print(f"Warning: Could not create session directory {session_dir}: {e}")
+
+# 延迟初始化 jieba 词典（在首次请求时初始化）
+_jieba_initialized = False
+
+def initialize_jieba():
+    global _jieba_initialized
+    if not _jieba_initialized:
+        jieba.initialize()
+        _jieba_initialized = True
 
 app = Flask(__name__)
 # 从环境变量读取密钥，如果不存在则使用默认值（仅用于开发）
 app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key-here-for-development-only')
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 限制上传文件 16MB
 
+# 配置Session（Railway部署必需）
+app.config['SESSION_TYPE'] = 'filesystem'
+app.config['SESSION_FILE_DIR'] = session_dir
+app.config['SESSION_PERMANENT'] = False
+app.config['SESSION_USE_SIGNER'] = True
+
+# 初始化Session
+from flask_session import Session
+Session(app)
+
 
 def count_exact(text, words):
     """精确模式：字符串count，返回结果和总词数（分词后）"""
+    initialize_jieba()  # 确保jieba已初始化
     seg_list = list(jieba.cut(text))
     total_words = len(seg_list)
     results = {w: text.count(w) for w in words}
@@ -24,6 +49,7 @@ def count_exact(text, words):
 
 def count_seg(text, words):
     """分词模式：文本分词后，查找每个短语的分词子序列，返回结果和总词数"""
+    initialize_jieba()  # 确保jieba已初始化
     seg_list = list(jieba.cut(text))
     total_words = len(seg_list)
     results = {}
@@ -43,6 +69,7 @@ def count_subsequence(seq, target):
 
 def search_containing_words(text, keywords):
     """搜索模式：找出所有包含关键词的词及其频次，返回结果和总词数"""
+    initialize_jieba()  # 确保jieba已初始化
     seg_list = list(jieba.cut(text))
     total_words = len(seg_list)
     word_counts = Counter(seg_list)

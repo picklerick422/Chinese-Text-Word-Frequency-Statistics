@@ -1987,9 +1987,9 @@
         window.addEventListener('load', function() {
             // 全局数据存储（确保删除后数据统一）
             const globalData = {
-                totalOccurrences: {{ total_matched_occurrences|default(0)|tojson }},
-                originalChartData: {{ chart_data|default([])|tojson }},
-                currentChartData: JSON.parse(JSON.stringify({{ chart_data|default([])|tojson }})),
+                totalOccurrences: {{ total_matched_occurrences|tojson }},
+                originalChartData: {{ chart_data|tojson }},
+                currentChartData: JSON.parse(JSON.stringify({{ chart_data|tojson }})),
                 deletedWords: [] // 记录已删除的词
             };
 
