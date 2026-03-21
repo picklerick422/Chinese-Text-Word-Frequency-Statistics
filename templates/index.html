@@ -1365,7 +1365,7 @@
                                         </div>
                                     </div>
                                     <div class="card-body">
-                                        <p class="mb-2">组内总次数：<span class="group-total">{{ group_total }}</span> (全局占比：<span class="group-percent">{{ "%.2f"|format((group_total / total_matched_occurrences * 100) if total_matched_occurrences > 0 else 0) }}%</span>)</p>
+                                        <p class="mb-2">组内总次数：<span class="group-total">{{ group_total }}</span> (全局占比：<span class="group-percent">{{ "%.2f"|format(group_total / total_matched_occurrences * 100) }}%</span>)</p>
                                         <ul class="list-group list-group-flush">
                                             {% if matches %}
                                                 {% for word, cnt in matches.items() %}
@@ -1378,7 +1378,7 @@
                                                             <span class="word-text">{{ word }}</span>
                                                             <span>
                                                                 <span class="badge bg-primary rounded-pill me-2 count-text">{{ cnt }}</span>
-                                                                <small class="text-muted percent-text">{{ "%.2f"|format((cnt / total_matched_occurrences * 100) if total_matched_occurrences > 0 else 0) }}%</small>
+                                                                <small class="text-muted percent-text">{{ "%.2f"|format(cnt / total_matched_occurrences * 100) }}%</small>
                                                             </span>
                                                         </div>
                                                     </li>

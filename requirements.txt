@@ -1,4 +1,4 @@
-Flask>=2.0
-jieba
-python-docx
-gunicorn
+Flask==2.3.3
+jieba==0.42.1
+python-docx==0.8.11
+gunicorn==21.2.0

@@ -3,12 +3,14 @@ import jieba
 from flask import Flask, request, render_template, flash, redirect, url_for
 from collections import Counter
 from docx import Document
+import os
 
 # 预加载 jieba 词典
 jieba.initialize()
 
 app = Flask(__name__)
-app.secret_key = 'your-secret-key-here'  # 请修改为随机字符串
+# 从环境变量读取密钥，如果不存在则使用默认值（仅用于开发）
+app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key-here-for-development-only')
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 限制上传文件 16MB
 
 
@@ -181,7 +183,7 @@ def index():
             columns_data = None
 
         # 词频占比图数据：只按关键词占比，[关键词, 总次数] 列表
-        chart_data = []
+        chart_data = None
         if generate_chart and results:
             if mode == 'search':
                 # 每个关键词下匹配词的总次数
@@ -213,28 +215,15 @@ def index():
     return render_template(
         'index.html', 
         mode=None, 
-        results=None,
-        total_words=0,
-        elapsed=0,
-        keywords=[],
-        input_type='file',
-        direct_text='',
-        categories_raw='',
-        category_stats={},
-        total_matched_occurrences=0,
-        columns_data=[],
-        display_columns=3,
-        generate_chart=False,
-        chart_type='pie',
-        chart_option='',
-        chart_data=[]
+        results=None, 
+        chart_option='pie',
+        chart_type='pie'  # 补充这个变量，值根据你的需求调整（比如 pie/bar/line 等）
     )
 
 
 if __name__ == '__main__':
     # 生产环境通常使用 Gunicorn 或其它 WSGI 服务器启动，
     # 下面的配置仅用于本地调试。
-    import os
     port = int(os.environ.get('PORT', 5000))
-    debug_mode = os.environ.get('FLASK_DEBUG', '1') == '1'
+    debug_mode = os.environ.get('FLASK_DEBUG', '0') == '1'  # 生产环境默认关闭debug
     app.run(host='0.0.0.0', port=port, debug=debug_mode)
